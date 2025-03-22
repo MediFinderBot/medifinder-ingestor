@@ -14,10 +14,13 @@ class FileParser:
     def __init__(self, file_path):
         self.file_path = file_path
     
-    def parse(self):
+    def parse(self, start_index=0):
         """
         Parse the source file and return records
         
+        Args:
+            start_index (int): Index of the first record to process (for resuming)
+            
         Returns:
             list: List of dictionaries representing each record
         """
@@ -51,6 +54,13 @@ class FileParser:
                 for line_num, line in enumerate(file, 1):
                     line = line.strip()
                     if not line or line.startswith('ÿþ'):  # Skip empty lines and BOM markers
+                        continue
+                    
+                    # Skip records before the start_index
+                    if line_count < start_index:
+                        line_count += 1
+                        if line_count % 10000 == 0:
+                            logger.info(f"Skipped {line_count} records...")
                         continue
                     
                     try:

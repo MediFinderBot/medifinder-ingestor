@@ -36,6 +36,8 @@ def main():
     # Set up argument parser
     parser = argparse.ArgumentParser(description='MediFinderBot Data Ingestion Service')
     parser.add_argument('source_file', help='Path to the source data text file')
+    parser.add_argument('start_index', nargs='?', type=int, default=0, 
+                        help='Starting record index (for resuming interrupted processing)')
     parser.add_argument('--log-level', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'], 
                         default='INFO', help='Set logging level')
     args = parser.parse_args()
@@ -56,8 +58,8 @@ def main():
         
         # Parse source file
         file_parser = FileParser(args.source_file)
-        records = file_parser.parse()
-        logger.info(f"Parsed {len(records)} records from source file")
+        records = file_parser.parse(start_index=args.start_index)
+        logger.info(f"Parsed {len(records)} records from source file (starting from index {args.start_index})")
         
         # Process records
         etl = ETLProcessor(db_manager)

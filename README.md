@@ -54,15 +54,26 @@ Run the ingestor with a data file:
 python medifinder-ingestor.py /path/to/your/data.txt
 ```
 
+### Resuming Interrupted Processing
+
+If processing was interrupted, you can resume from a specific record:
+
+```bash
+python medifinder-ingestor.py /path/to/your/data.txt 3000
+```
+
+This will skip the first 3000 records and continue processing from there.
+
 ### Options
 
 ```
-usage: medifinder-ingestor.py [-h] [--log-level {DEBUG,INFO,WARNING,ERROR}] source_file
+usage: medifinder-ingestor.py [-h] [--log-level {DEBUG,INFO,WARNING,ERROR}] source_file [start_index]
 
 MediFinderBot Data Ingestion Service
 
 positional arguments:
   source_file           Path to the source data text file
+  start_index           Starting record index (for resuming interrupted processing)
 
 optional arguments:
   -h, --help            show this help message and exit
