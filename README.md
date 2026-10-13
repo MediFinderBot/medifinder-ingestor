@@ -12,6 +12,8 @@ A robust ETL (Extract, Transform, Load) service for the MediFinderBot ecosystem 
 - **Complete Logging**: Detailed activity logs for monitoring and troubleshooting
 - **Automatic Cleanup**: Marks medicines not in the current import as out of stock
 - **SSH Tunnel Support**: Connects securely to PythonAnywhere PostgreSQL databases
+- **Automated Web Scrapers**: Built-in scrapers for MINSA DIGEMID product catalog (REST API) and MINSA SISMED regional stock reports (Power BI headless automation)
+
 
 ## Prerequisites
 
@@ -63,6 +65,30 @@ python medifinder-ingestor.py /path/to/your/data.txt 3000
 ```
 
 This will skip the first 3000 records and continue processing from there.
+### Automated Web Scrapers
+
+The ingestor includes automated scrapers in `services/scrapers/` to extract source data without manual downloads:
+
+#### 1. MINSA DIGEMID Product Catalog Scraper
+Retrieves the full national pharmaceutical catalog (18,000+ products) via direct REST microservice query:
+```python
+from services.scrapers import DigemidScraper
+
+scraper = DigemidScraper()
+df = scraper.get_dataframe()
+print(f"Loaded {len(df)} products")
+```
+
+#### 2. MINSA SISMED Regional Stock Scraper
+Extracts daily facility stock levels by automating MINSA's Power BI reporting dashboard using headless Chromium:
+```python
+from services.scrapers import SismedScraper
+
+scraper = SismedScraper(headless=True)
+df = scraper.scrape_region(region="TUMBES", max_batches=4)
+latest_date, snapshot = SismedScraper.extract_latest_snapshot(df)
+print(f"Latest snapshot ({latest_date}): {len(snapshot)} rows")
+```
 
 ### Options
 
